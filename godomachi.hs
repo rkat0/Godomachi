@@ -160,20 +160,7 @@ cutExPoints (c,poly) = map minCut . filter f . map connectBlocks
         connectBlocks = L.sortBy (\x y -> compare (S.size y) (S.size x)) . S.toList . S.fromList . dfsSets pg
         f x = S.size (head x) * 2 >= length c + length poly
         minCut = (\b -> (sort $ c ++ (poly \\ b),b)) . S.elems . head
-{-}
-cutex :: Polyomino -> [Cut]
-cutex p = map minCut . filter f . map connectBlocks $ arts
-    where
-        pg = polyToGraph p
-        arts = filter (\v -> degree pg v >= 3) . articulation $ pg
-        connectBlocks = L.sortBy (\x y -> compare (S.size y) (S.size x)) . S.toList . S.fromList . dfsSets pg
-        f x = length x >= 3 && S.size (head x) * 2 >= length pg
-        minCut = (\b -> (p \\ b,b)) . S.elems . head
 
-cutAll :: Polyomino -> [[Cut]]
-cutAll p = map (cutn p ex) $ reverse [1..length p `div` 2]
-    where ex = cutex p
--}
 cutAllEx :: Polyomino -> [[Cut]]
 cutAllEx p = map (L.nubBy (\(a,b) (c,d) -> a == c && equiv b d) . map (first canonical)) . fst $ cutWithEx p (length p `div` 2)
 
@@ -288,7 +275,6 @@ printFirstMoves b@(p1,p2) = do
     printP p1
     printP p2
     mapM_ (\xs@(x:_) -> divide >> putStrLn (show (length xs) ++ " steps\n") >> printMove x) mss
---    printMoves $ map head mss
     putStrLn $ "first wins in " ++ show (length mss) ++ '/':show num ++ " patterns"
 
 prune :: Tree Move -> Tree Move
@@ -313,8 +299,6 @@ solveAll :: Int -> IO()
 solveAll n = do
     putStrLn $ show n ++ "-ominoes : " ++ show m
     putStrLn $ "total patterns : " ++ show total
-    mapM_ (\((_,p1,p2):_) -> divide >> printP p1 >> printP p2 >> divide) . filter ((== 6) . length) $ moves
-    divide
     putStrLn $ "        first  : " ++ show (total - lose)
     putStrLn $ "                 " ++ show (IM.toAscList win1)
     putStrLn $ "        second : " ++ show lose
@@ -349,6 +333,7 @@ main = do
         printFirstMoves (p1,p2)
     else if head args == "--rank"
     then printPolyominoes (read $ args!!1)
+{-
     else if head args == "--custom"
     then do
         let p8 = rank 8
@@ -357,4 +342,5 @@ main = do
         let pp = map ((!!) p8 *** (!!) p8) idx
         let pp_diff = filter ((== 6) . length . search . gametree) pp
         mapM_ (\(p,q) -> divide >> printP p >> printP q >> divide ) pp_diff
+-}
     else solveAll . read . head $ args
