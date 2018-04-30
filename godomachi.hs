@@ -6,6 +6,7 @@ import Data.List (sort,(\\))
 import qualified Data.List as L
 import qualified Data.Set as S
 import qualified Data.IntMap as IM
+import qualified Data.Map as M
 import Data.Tree
 
 import Graph
@@ -105,7 +106,7 @@ printPolyominoes :: Int -> IO()
 printPolyominoes n = do
     let ps = rank n
     putStrLn $ "\nAll free " ++ show n ++ "-ominoes : " ++ show (length ps)
-    mapM_ (putStrLn . textRepresentaton) ps
+    mapM_ (\(i,p) -> print i >> putStrLn (textRepresentaton p)) $ zip [0..] ps
 
 polyToGraph :: Polyomino -> Graph Point
 polyToGraph p = buildNDG p es
@@ -127,20 +128,7 @@ cut1' :: Polyomino -> [Cut]
 cut1' p = unique $ map (cutWith p) narts
     where
         narts = map (:[]) $ notArticulation $ polyToGraph p
-{-
-cutn :: Polyomino -> [Cut] -> Int -> [Cut]
-cutn p ex n = L.nubBy (\(a,b) (c,d) -> a == c && equiv b d) . map (first canonical) $ cutn' p ex n
 
-cutn' :: Polyomino -> [Cut] -> Int -> [Cut]
-cutn' p _ 1 = cut1' p
-cutn' p ex n = (exn ++) . concat $ zipWith add1 cs (map f cs)
---cutn' p ex n = (exn ++) . L.nubBy (\(a,b) (c,d) -> equiv a c && equiv b d) . concat $ zipWith add1 cs (map f cs)
-    where
-        exn = filter (\(x,_) -> length x == n) ex
-        cs = cutn' p (ex \\ exn) (n-1)
-        f (a,b) = newPoints a `L.intersect` notArticulation (polyToGraph b)
-        add1 (a,b) = foldr (\x -> (:) (x:a,L.delete x b)) []
--}
 cutWithEx :: Polyomino -> Int -> ([[Cut]],[Cut])
 cutWithEx p 1 = ([cut1' p],[])
 cutWithEx p n = (cs' : css, exr ++ ex_big)
@@ -313,6 +301,29 @@ solveAll n = do
         m = length ps
         ps = rank n
 
+solveAllMat :: Int -> IO()
+solveAllMat n = do
+    putStrLn $ show n ++ "-ominoes : " ++ show m
+    putStrLn $ "total patterns : " ++ show total ++ " (= " ++ show m ++ " * " ++ show (m-1) ++ " / 2)"
+    putStrLn $ "        first  : " ++ show (total - lose)
+    putStrLn $ "                 " ++ show (IM.toAscList win1)
+    putStrLn $ "        second : " ++ show lose
+    putStrLn $ "                 " ++ show (IM.toAscList win2)
+    putStrLn $ unlines [[find (i,j) | j <- [1..m]] | i <- [1..m]]
+    where
+        lose = IM.foldr (+) 0 win2
+        (win1,win2) = IM.partitionWithKey (\k _ -> odd k) moveCount
+        moveCount = IM.fromListWith (+) $ map (\(_,x) -> (x,1)) moves
+        moveMap = M.fromList moves
+        moves = map (second (subtract 1 . length . search . gametree)) [((i1,i2),(p1,p2)) | (i1,p1) <- zip [1..] ps, (i2,p2) <- zip [1..] ps, i1 < i2]
+        total = m*(m-1) `div` 2
+        m = length ps
+        ps = rank n
+        find (i,j)
+            | i == j = '0'
+            | i > j = head . show $ moveMap M.! (j,i)
+            | i < j = head . show $ moveMap M.! (i,j)
+
 getLines :: IO [String]
 getLines = do
     s <- getLine
@@ -332,7 +343,9 @@ main = do
         p2 <- fromString <$> getLines
         printFirstMoves (p1,p2)
     else if head args == "--rank"
-    then printPolyominoes (read $ args!!1)
+    then printPolyominoes (read $ args !! 1)
+    else if head args == "--matrix"
+    then solveAllMat . read $ args !! 1
 {-
     else if head args == "--custom"
     then do
