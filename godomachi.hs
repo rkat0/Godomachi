@@ -298,7 +298,7 @@ solve = printAns . search . gametree
 solveAll :: Int -> IO()
 solveAll n = do
     putStrLn $ show n ++ "-ominoes : " ++ show m
-    putStrLn $ "total patterns : " ++ show total
+    putStrLn $ "total patterns : " ++ show total ++ " (= " ++ show m ++ " * " ++ show (m-1) ++ " / 2)"
     putStrLn $ "        first  : " ++ show (total - lose)
     putStrLn $ "                 " ++ show (IM.toAscList win1)
     putStrLn $ "        second : " ++ show lose
