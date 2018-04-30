@@ -303,13 +303,14 @@ solveAll n = do
 
 solveAllMat :: Int -> IO()
 solveAllMat n = do
+    putStrLn $ unlines [[find (i,j) | j <- [1..m]] | i <- [1..m]]
+    putStrLn ""
     putStrLn $ show n ++ "-ominoes : " ++ show m
     putStrLn $ "total patterns : " ++ show total ++ " (= " ++ show m ++ " * " ++ show (m-1) ++ " / 2)"
     putStrLn $ "        first  : " ++ show (total - lose)
     putStrLn $ "                 " ++ show (IM.toAscList win1)
     putStrLn $ "        second : " ++ show lose
     putStrLn $ "                 " ++ show (IM.toAscList win2)
-    putStrLn $ unlines [[find (i,j) | j <- [1..m]] | i <- [1..m]]
     where
         lose = IM.foldr (+) 0 win2
         (win1,win2) = IM.partitionWithKey (\k _ -> odd k) moveCount
