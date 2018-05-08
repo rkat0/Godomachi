@@ -262,8 +262,8 @@ printFirstMoves b@(p1,p2) = do
     putStrLn "Initial board\n"
     printP p1
     printP p2
-    mapM_ (\xs@(x:_) -> divide >> putStrLn (show (length xs) ++ " steps\n") >> printMove x) mss
-    putStrLn $ "first wins in " ++ show (length mss) ++ '/':show num ++ " patterns"
+    mapM_ (\xs@(x:_) -> divide >> putStrLn (show (length xs) ++ " step(s)\n") >> printMove x) mss
+    putStrLn $ "first wins by " ++ show (length mss) ++ '/':show num ++ " pattern(s)"
 
 prune :: Tree Move -> Tree Move
 prune (Node r ts) = Node r (if isEnd' r then [] else map prune ts)
@@ -280,7 +280,7 @@ solve = printAns . search . gametree
             printMoves ms
             putStr $ (if odd step then "First" else "Second") ++ " player wins in "
             putStr $ show step
-            putStrLn " step!"
+            putStrLn " step(s)!"
             where step = length ms - 1
 
 solveAll :: Int -> IO()

@@ -76,7 +76,7 @@ $ ./godomachi
 
 ----------
 
-First player wins in 1 step!
+First player wins in 1 step(s)!
 ```
 
 ---
@@ -111,7 +111,7 @@ Initial board
 
 ----------
 
-1 steps
+1 step(s)
 
 #
 #
@@ -122,7 +122,7 @@ Initial board
 
 ----------
 
-1 steps
+1 step(s)
 
 #
 
@@ -133,7 +133,7 @@ Initial board
 ###
 #..
 
-first wins in 2/6 patterns
+first wins by 2/6 pattern(s)
 
 ```
 
@@ -151,22 +151,27 @@ $ ./godomachi --rank 4
 ```
 ```
 All free 4-ominoes : 5
+0
 #
 #
 #
 #
 
+1
 ##
 #.
 #.
 
+2
 #.
 ##
 #.
 
+3
 ##
 ##
 
+4
 #.
 ##
 .#
